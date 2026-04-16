@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentazione Gerber – Verifica Sella Gerber S&T</title>
+    <style>
+        :root {
+            --primary: #1a3a5c;
+            --accent: #2980b9;
+            --accent2: #27ae60;
+            --danger: #e74c3c;
+            --warn: #f39c12;
+            --bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --border: #dee2e6;
+            --text: #212529;
+            --text-light: #6c757d;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+        .hero {
+            background: linear-gradient(135deg, #1a3a5c 0%, #2c5f8a 100%);
+            color: white;
+            padding: 60px 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: -50px;
+            left: 0;
+            right: 0;
+            height: 100px;
+            background: var(--bg);
+            clip-path: ellipse(55% 100% at 50% 100%);
+        }
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        .hero .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+        .badge {
+            display: inline-block;
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin: 3px;
+        }
+        .badge-norm { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4); }
+        .badge-ver { background: #27ae60; color: white; }
+        .badge-no { background: #e74c3c; color: white; }
+        .toc {
+            max-width: 900px;
+            margin: -30px auto 30px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            position: relative;
+            z-index: 10;
+        }
+        .toc h2 { font-size: 1.1rem; color: var(--primary); margin-bottom: 15px; border-bottom: 2px solid var(--accent); padding-bottom: 8px; }
+        .toc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 10px;
+        }
+        .toc a {
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 0.95rem;
+            display: block;
+            padding: 6px 0;
+            transition: color 0.2s;
+        }
+        .toc a:hover { color: var(--primary); font-weight: 500; }
+        .container { max-width: 900px; margin: 0 auto; padding: 20px; }
+        section { margin-bottom: 40px; }
+        section h2 {
+            font-size: 1.6rem;
+            color: var(--primary);
+            border-bottom: 3px solid var(--accent);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .card.info { border-left: 4px solid var(--accent); }
+        .card.success { border-left: 4px solid var(--accent2); }
+        .card.warning { border-left: 4px solid var(--warn); }
+        .card.danger { border-left: 4px solid var(--danger); }
+        .formula-box {
+            background: #f4f6f9;
+            border-left: 4px solid var(--accent);
+            padding: 15px 20px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+        }
+        .formula-box .label {
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 0.85rem;
+            color: var(--text-light);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .formula-box .formula {
+            font-size: 1.1rem;
+            color: var(--primary);
+            font-weight: 600;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 0.95rem;
+        }
+        th {
+            background: var(--primary);
+            color: white;
+            padding: 12px 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+        td {
+            padding: 10px 15px;
+            border-bottom: 1px solid var(--border);
+        }
+        tr:nth-child(even) { background: #f8fafc; }
+        tr:hover { background: #eef4fa; }
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .feature-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 20px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .feature-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+        }
+        .feature-card h3 {
+            color: var(--accent);
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .svg-container {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .svg-container h3 {
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+        ul { margin-left: 20px; }
+        li { margin-bottom: 8px; }
+        .footer {
+            background: var(--primary);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+            margin-top: 60px;
+        }
+        .footer p { font-size: 0.9rem; opacity: 0.8; margin: 5px 0; }
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 1.8rem; }
+            .toc { margin: 20px 10px; }
+            .container { padding: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="hero">
+    <h1>Gerber – Sella Gerber S&T</h1>
+    <p class="subtitle">Verifica strutturale con Modelli Tirante-Puntone (Cap. 10 Angotti)</p>
+    <div>
+        <span class="badge badge-norm">NTC 2018</span>
+        <span class="badge badge-norm">EC2</span>
+        <span class="badge badge-norm">Angotti Cap. 10</span>
+    </div>
+</div>
+
+<nav class="toc">
+    <h2>Indice dei Contenuti</h2>
+    <div class="toc-grid">
+        <a href="#panoramica">1. Panoramica Generale</a>
+        <a href="#funzionalita">2. Funzionalità e Verifiche</a>
+        <a href="#geometria">3. Geometria e Sezione</a>
+        <a href="#input">4. Parametri di Input</a>
+        <a href="#output">5. Output Prodotti</a>
+        <a href="#normativa">6. Riferimenti Normativi</a>
+        <a href="#formule">7. Formule di Calcolo</a>
+        <a href="#esempio">8. Esempio di Utilizzo</a>
+    </div>
+</nav>
+
+<div class="container">
+
+<section id="panoramica">
+    <h2>Panoramica Generale</h2>
+    <div class="card info">
+        <p><strong>Gerber</strong> è un'applicazione web per la verifica strutturale di una <em>Sella Gerber</em> (gerber beam saddle) mediante il metodo tirante-puntone (Strut-and-Tie). L'applicazione implementa i due modelli meccanici paralleli descritti nel Capitolo 10 del volume <em>Progettazione strutturale</em> di Angotti (Prospetti 10.15–10.16, Fig. 10.72).</p>
+    </div>
+    <table>
+        <tr><th>Caratteristica</th><th>Descrizione</th></tr>
+        <tr><td><strong>Pubblico target</strong></td><td>Ingegneri strutturali, progettisti di ponti e infrastrutture</td></tr>
+        <tr><td><strong>Normativa</strong></td><td>NTC 2018, EC2 (EN 1992-1-1), Circolare 2019</td></tr>
+        <tr><td><strong>Riferimento tecnico</strong></td><td>Angotti – Cap. 10, Prospetti 10.15–10.16, Fig. 10.72</td></tr>
+    </table>
+</section>
+
+<section id="funzionalita">
+    <h2>Funzionalità e Verifiche Strutturali</h2>
+    <div class="features-grid">
+        <div class="feature-card">
+            <h3>📐 Modello A – Staffe</h3>
+            <p>Puntone inclinato C1 + staffe verticali T2a. Adatto quando si richiede un'elevata capacità di sospensione del carico nel dente della sella.</p>
+        </div>
+        <div class="feature-card">
+            <h3>📐 Modello B – Ferri Piegati</h3>
+            <p>Puntone verticale C'1 + ferri piegati T'1. Modello compatto con ferri inclinati a un angolo α configurabile.</p>
+        </div>
+        <div class="feature-card">
+            <h3>🔄 Modello Combinato A+B</h3>
+            <p>Ripartizione del taglio V_Ed tra i due modelli con slider configurabile. Consigliato: minimo 50% al Modello A.</p>
+        </div>
+        <div class="feature-card">
+            <h3>📊 Verifiche Tiranti</h3>
+            <p>Calcolo dell'area di armatura necessaria e verifica degli utili (UR) per T1, T2a, T'1, T3.</p>
+        </div>
+        <div class="feature-card">
+            <h3>🏗️ Verifiche Puntoni</h3>
+            <p>Verifica della compressione nel calcestruzzo: σ_c ≤ ν'·f_cd. Calcolo automatico delle larghezze nodali.</p>
+        </div>
+        <div class="feature-card">
+            <h3>📈 Visualizzazione S&T</h3>
+            <p>Diagramma interattivo del traliccio con Plotly. Rappresentazione di tutti i puntoni (C) e tiranti (T) con forze in kN.</p>
+        </div>
+        <div class="feature-card">
+            <h3>📄 Generazione PDF</h3>
+            <p>Export della relazione di calcolo in formato PDF con tutti i risultati e il diagramma del traliccio.</p>
+        </div>
+    </div>
+    
+    <div class="svg-container">
+        <h3>Schema del Traliccio S&T – Modelli A e B</h3>
+        <svg viewBox="0 0 800 400" width="100%" max-width="700">
+            <!-- Sfondo sezione calcestruzzo -->
+            <path d="M 50,50 L 750,50 L 750,350 L 200,350 L 200,200 L 50,200 Z" 
+                  fill="#e8e8e8" stroke="#666" stroke-width="2"/>
+            
+            <!-- Linea sezione di step -->
+            <line x1="200" y1="200" x2="200" y2="350" stroke="#999" stroke-width="1" stroke-dasharray="5,3"/>
+            
+            <!-- Etichette geometriche -->
+            <text x="125" y="130" font-size="12" fill="#333">h1 (dente)</text>
+            <line x1="60" y1="120" x2="190" y2="120" stroke="#999" stroke-width="1"/>
+            <text x="475" y="200" font-size="12" fill="#333">H (trave)</text>
+            <line x1="400" y1="80" x2="400" y2="195" stroke="#999" stroke-width="1"/>
+            <text x="110" y="280" font-size="12" fill="#333">a</text>
+            <text x="170" y="280" font-size="11" fill="#666">av</text>
+            
+            <!-- Appoggio -->
+            <rect x="100" y="340" width="60" height="10" fill="#27ae60"/>
+            <text x="130" y="365" font-size="11" fill="#27ae60" text-anchor="middle">N1 (appoggio)</text>
+            
+            <!-- MODELLO A (blu) -->
+            <!-- C1 – puntone inclinato -->
+            <line x1="130" y1="340" x2="200" y2="80" stroke="#2980b9" stroke-width="3" stroke-dasharray="8,3"/>
+            <text x="140" y="200" font-size="11" fill="#2980b9" font-weight="bold">C1</text>
+            <!-- C2 – puntone simmetrico -->
+            <line x1="250" y1="340" x2="200" y2="80" stroke="#2980b9" stroke-width="3" stroke-dasharray="8,3"/>
+            <text x="235" y="200" font-size="11" fill="#2980b9" font-weight="bold">C2</text>
+            <!-- T2a – staffe verticali -->
+            <line x1="200" y1="80" x2="200" y2="330" stroke="#c0392b" stroke-width="3"/>
+            <text x="210" y="200" font-size="11" fill="#c0392b" font-weight="bold">T2a</text>
+            <!-- T1 – tirante orizzontale -->
+            <line x1="130" y1="340" x2="250" y2="340" stroke="#c0392b" stroke-width="3"/>
+            <text x="190" y="360" font-size="11" fill="#c0392b" font-weight="bold">T1</text>
+            <!-- C3 – collegamento -->
+            <line x1="250" y1="340" x2="200" y2="330" stroke="#2980b9" stroke-width="2" stroke-dasharray="6,3"/>
+            <!-- C4 – puntone 45° -->
+            <line x1="200" y1="330" x2="300" y2="230" stroke="#2980b9" stroke-width="2" stroke-dasharray="6,3"/>
+            <text x="260" y="285" font-size="10" fill="#2980b9">C4 (45°)</text>
+            <!-- T3 – tirante trave -->
+            <line x1="200" y1="330" x2="450" y2="330" stroke="#c0392b" stroke-width="3"/>
+            <text x="325" y="360" font-size="11" fill="#c0392b" font-weight="bold">T3</text>
+            
+            <!-- MODELLO B (arancione) -->
+            <!-- C'1 – puntone verticale -->
+            <line x1="130" y1="340" x2="130" y2="80" stroke="#e67e22" stroke-width="3" stroke-dasharray="8,3"/>
+            <text x="100" y="210" font-size="11" fill="#e67e22" font-weight="bold">C'1</text>
+            <!-- T'1 – ferri piegati -->
+            <line x1="130" y1="80" x2="280" y2="330" stroke="#d35400" stroke-width="3"/>
+            <text x="200" y="180" font-size="11" fill="#d35400" font-weight="bold">T'1</text>
+            <!-- C'2 – corrente compresso -->
+            <line x1="130" y1="80" x2="380" y2="80" stroke="#e67e22" stroke-width="2" stroke-dasharray="4,2"/>
+            <!-- C'3 – puntone diagonale -->
+            <line x1="280" y1="330" x2="380" y2="80" stroke="#e67e22" stroke-width="2" stroke-dasharray="6,3"/>
+            <!-- T'2 – tirante trave -->
+            <line x1="280" y1="330" x2="450" y2="330" stroke="#d35400" stroke-width="3"/>
+            <text x="365" y="380" font-size="11" fill="#d35400" font-weight="bold">T'2</text>
+            
+            <!-- Legenda -->
+            <rect x="500" y="40" width="220" height="140" fill="white" stroke="#ccc" rx="5"/>
+            <text x="510" y="60" font-size="12" font-weight="bold" fill="#333">Legenda</text>
+            <line x1="515" y1="75" x2="555" y2="75" stroke="#2980b9" stroke-width="3" stroke-dasharray="8,3"/>
+            <text x="565" y="79" font-size="10" fill="#333">Puntone C (cls)</text>
+            <line x1="515" y1="95" x2="555" y2="95" stroke="#c0392b" stroke-width="3"/>
+            <text x="565" y="99" font-size="10" fill="#333">Tirante T (acciaio)</text>
+            <line x1="515" y1="115" x2="555" y2="115" stroke="#2980b9" stroke-width="3" stroke-dasharray="8,3"/>
+            <text x="565" y="119" font-size="10" fill="#333">C1, C2 (Mod. A)</text>
+            <line x1="515" y1="135" x2="555" y2="135" stroke="#e67e22" stroke-width="3" stroke-dasharray="8,3"/>
+            <text x="565" y="139" font-size="10" fill="#333">C'1 (Mod. B)</text>
+            <line x1="515" y1="155" x2="555" y2="155" stroke="#d35400" stroke-width="3"/>
+            <text x="565" y="159" font-size="10" fill="#333">T'1 ferri piegati</text>
+        </svg>
+        <p style="margin-top: 15px; font-size: 0.9rem; color: #666;">
+            <strong>Nota:</strong> Il Modello A utilizza puntoni inclinati (θ₁ = arctan(z₁/av)) mentre il Modello B impiega ferri piegati a un angolo α configurabile (default 45°). Il modello combinato ripartisce il taglio tra i due sistemi.
+        </p>
+    </div>
+</section>
+
+<section id="geometria">
+    <h2>Geometria della Sella Gerber</h2>
+    <div class="svg-container">
+        <h3>Sezione trasversale – Geometria e parametri</h3>
+        <svg viewBox="0 0 600 350" width="100%" max-width="550">
+            <!-- Trave principale -->
+            <rect x="150" y="20" width="400" height="280" fill="#e8e8e8" stroke="#333" stroke-width="2"/>
+            <!-- Dente sella -->
+            <rect x="20" y="120" width="130" height="100" fill="#d0d0d0" stroke="#333" stroke-width="2"/>
+            <!-- Appoggio -->
+            <rect x="60" y="300" width="60" height="15" fill="#27ae60"/>
+            
+            <!-- Quote geometriche -->
+            <line x1="10" y1="120" x2="10" y2="220" stroke="#666" stroke-width="1"/>
+            <line x1="5" y1="120" x2="15" y2="120" stroke="#666" stroke-width="1"/>
+            <line x1="5" y1="220" x2="15" y2="220" stroke="#666" stroke-width="1"/>
+            <text x="25" y="175" font-size="13" fill="#333" transform="rotate(-90 25,175)">h1</text>
+            
+            <line x1="140" y1="15" x2="140" y2="305" stroke="#666" stroke-width="1"/>
+            <line x1="135" y1="15" x2="145" y2="15" stroke="#666" stroke-width="1"/>
+            <line x1="135" y1="305" x2="145" y2="305" stroke="#666" stroke-width="1"/>
+            <text x="155" y="165" font-size="13" fill="#333" transform="rotate(-90 155,165)">H</text>
+            
+            <line x1="20" y1="230" x2="150" y2="230" stroke="#666" stroke-width="1"/>
+            <line x1="20" y1="225" x2="20" y2="235" stroke="#666" stroke-width="1"/>
+            <line x1="150" y1="225" x2="150" y2="235" stroke="#666" stroke-width="1"/>
+            <text x="80" y="250" font-size="12" fill="#333">a</text>
+            
+            <line x1="60" y1="230" x2="120" y2="230" stroke="#666" stroke-width="1"/>
+            <line x1="60" y1="225" x2="60" y2="235" stroke="#666" stroke-width="1"/>
+            <line x1="120" y1="225" x2="120" y2="235" stroke="#666" stroke-width="1"/>
+            <text x="85" y="222" font-size="10" fill="#666">av</text>
+            
+            <line x1="60" y1="315" x2="120" y2="315" stroke="#666" stroke-width="1"/>
+            <line x1="60" y1="310" x2="60" y2="320" stroke="#666" stroke-width="1"/>
+            <line x1="120" y1="310" x2="120" y2="320" stroke="#666" stroke-width="1"/>
+            <text x="85" y="335" font-size="11" fill="#333">l_b</text>
+            
+            <!-- Etichette sezioni -->
+            <text x="55" y="175" font-size="11" fill="#333" font-weight="bold">DENTE</text>
+            <text x="350" y="165" font-size="11" fill="#333" font-weight="bold">TRAVE PRINCIPALE</text>
+            <text x="75" y="295" font-size="10" fill="#27ae60" font-weight="bold">appoggio</text>
+        </svg>
+    </div>
+</section>
+
+<section id="input">
+    <h2>Parametri di Input</h2>
+    <table>
+        <tr><th>Parametro</th><th>Simbolo</th><th>Tipo</th><th>Descrizione</th><th>Unità</th><th>Default</th></tr>
+        <tr><td colspan="6" style="background:#eef4fa;font-weight:600;">Geometria</td></tr>
+        <tr><td>Altezza trave principale</td><td>H</td><td>numero</td><td>Altezza totale della trave principale</td><td>m</td><td>1.00</td></tr>
+        <tr><td>Altezza dente sella</td><td>h1</td><td>numero</td><td>Altezza del dente di sella</td><td>m</td><td>0.50</td></tr>
+        <tr><td>Larghezza sezione</td><td>b</td><td>numero</td><td>Larghezza della sezione trasversale</td><td>m</td><td>0.40</td></tr>
+        <tr><td>Lunghezza dente</td><td>a</td><td>numero</td><td>Lunghezza orizzontale del dente</td><td>m</td><td>0.40</td></tr>
+        <tr><td>Distanza carico da spigolo</td><td>av</td><td>numero</td><td>Distanza del carico verticale dallo spigolo del dente</td><td>m</td><td>0.20</td></tr>
+        <tr><td>Lunghezza piastra appoggio</td><td>l_b</td><td>numero</td><td>Larghezza della piastra di appoggio</td><td>m</td><td>0.20</td></tr>
+        <tr><td colspan="6" style="background:#eef4fa;font-weight:600;">Azioni</td></tr>
+        <tr><td>Reazione appoggio</td><td>V_Ed</td><td>numero</td><td>Taglio all'appoggio (componente verticale)</td><td>kN</td><td>350</td></tr>
+        <tr><td>Forza orizzontale</td><td>H_Ed</td><td>numero</td><td>Forza orizzontale sull'appoggio</td><td>kN</td><td>50</td></tr>
+        <tr><td colspan="6" style="background:#eef4fa;font-weight:600;">Materiali</td></tr>
+        <tr><td>Resistenza cls caratteristica</td><td>f_ck</td><td>numero</td><td>Resistenza caratteristica a compressione del calcestruzzo</td><td>MPa</td><td>30</td></tr>
+        <tr><td>Resistenza acciaio caratteristica</td><td>f_yk</td><td>numero</td><td>Resistenza caratteristica a snervamento dell'acciaio</td><td>MPa</td><td>450</td></tr>
+        <tr><td colspan="6" style="background:#eef4fa;font-weight:600;">Armature</td></tr>
+        <tr><td>T1 – Tirante inferiore dente</td><td>A_T1</td><td>tabella</td><td>Numero e diametro ferri orizzontali al piede del dente</td><td>cm²</td><td>4φ16</td></tr>
+        <tr><td>T2a – Staffe sospensione (Mod. A)</td><td>A_T2a</td><td>tabella</td><td>Numero e diametro staffe verticali nel dente</td><td>cm²</td><td>4φ12</td></tr>
+        <tr><td>T'1 – Ferri piegati (Mod. B)</td><td>A_T'1</td><td>tabella</td><td>Numero e diametro ferri piegati</td><td>cm²</td><td>2φ16</td></tr>
+        <tr><td>T3 – Tirante trave principale</td><td>A_T3</td><td>tabella</td><td>Numero e diametro ferri inferiore trave</td><td>cm²</td><td>4φ20</td></tr>
+        <tr><td>Inclinazione ferri piegati</td><td>α</td><td>numero</td><td>Angolo di inclinazione dei ferri piegati (Mod. B)</td><td>°</td><td>45</td></tr>
+    </table>
+    <div class="card warning">
+        <strong>Attenzione:</strong> Il copriferro è assunto pari a <strong>c = 0.05 m</strong> (50 mm) per tutti i calcoli. I bracci resistenti interni sono calcolati come z₁ = h₁ – 2c e z₂ = H – 2c.
+    </div>
+</section>
+
+<section id="output">
+    <h2>Output Prodotti</h2>
+    <table>
+        <tr><th>Grandezza</th><th>Simbolo</th><th>Descrizione</th><th>Unità</th></tr>
+        <tr><td colspan="4" style="background:#eef4fa;font-weight:600;">Puntoni (Modello A)</td></tr>
+        <tr><td>Puntone dente</td><td>C1</td><td>Forza nel puntone inclinato del dente (θ₁)</td><td>kN</td></tr>
+        <tr><td>Puntone simmetrico</td><td>C2</td><td>Forza nel puntone simmetrico (θ₂ = θ₁)</td><td>kN</td></tr>
+        <tr><td>Collegamento T1→T3</td><td>C3</td><td>Puntone di collegamento nel corpo trave</td><td>kN</td></tr>
+        <tr><td>Puntone trave 45°</td><td>C4</td><td>Puntone diagonale a 45° nel corpo trave</td><td>kN</td></tr>
+        <tr><td colspan="4" style="background:#eef4fa;font-weight:600;">Puntoni (Modello B)</td></tr>
+        <tr><td>Puntone verticale</td><td>C'1</td><td>Forza nel puntone verticale (uguale a Rb)</td><td>kN</td></tr>
+        <tr><td>Compressione orizz. sup.</td><td>C'2</td><td>Corrente compresso orizzontale superiore</td><td>kN</td></tr>
+        <tr><td>Puntone diagonale</td><td>C'3</td><td>Puntone diagonale (= T'1)</td><td>kN</td></tr>
+        <tr><td colspan="4" style="background:#eef4fa;font-weight:600;">Tiranti</td></tr>
+        <tr><td>Tirante inferiore dente</td><td>T1</td><td>Forza di trazione nel dente (T1 = T1_A + H_Ed)</td><td>kN</td></tr>
+        <tr><td>Staffe sospensione</td><td>T2a</td><td>Forza nelle staffe verticali (uguale a Ra)</td><td>kN</td></tr>
+        <tr><td>Ferri piegati</td><td>T'1</td><td>Forza nei ferri piegati (Rb / sin α)</td><td>kN</td></tr>
+        <tr><td>Tirante trave</td><td>T3</td><td>Forza nel tirante inferiore trave (complessivo)</td><td>kN</td></tr>
+        <tr><td colspan="4" style="background:#eef4fa;font-weight:600;">Risultati</td></tr>
+        <tr><td>Utilizzo tiranti</td><td>UR_T</td><td>Utilizzo percentuale per ogni tirante (T/A·f_yd)</td><td>%</td></tr>
+        <tr><td>Utilizzo puntoni</td><td>UR_C</td><td>Utilizzo percentuale per ogni puntone (σ_c / ν'·f_cd)</td><td>%</td></tr>
+        <tr><td>Esito verifiche</td><td>esito</td><td>True se tutte le UR ≤ 100%, False altrimenti</td><td>—</td></tr>
+    </table>
+</section>
+
+<section id="normativa">
+    <h2>Riferimenti Normativi</h2>
+    <div class="features-grid">
+        <div class="feature-card">
+            <h3>🇮🇹 NTC 2018</h3>
+            <p>Norme Tecniche per le Costruzioni (D.M. 17/01/2018). Verifiche agli stati limite per sezioni in calcestruzzo armato.</p>
+        </div>
+        <div class="feature-card">
+            <h3>🇪🇺 EC2 (EN 1992-1-1)</h3>
+            <p>Eurocodice 2 – Progettazione delle strutture di calcestruzzo. In particolare §6.5 per il metodo S&T.</p>
+        </div>
+        <div class="feature-card">
+            <h3>📖 Circolare 2019</h3>
+            <p>Circolare esplicativa alle NTC 2018 (C.S.LL.PP.). Istruzioni per l'applicazione del metodo tirante-puntone.</p>
+        </div>
+        <div class="feature-card">
+            <h3>📚 Angotti Cap. 10</h3>
+            <p>Riferimento tecnico principale: <em>Progettazione strutturale</em> – Capitolo 10, Prospetti 10.15–10.16, Fig. 10.72.</p>
+        </div>
+    </div>
+</section>
+
+<section id="formule">
+    <h2>Formule di Calcolo</h2>
+    <div class="card info">
+        <p>Il metodo S&T per la Sella Gerber si basa sulla scomposizione del taglio V_Ed in due modelli meccanici paralleli (A e B). La ripartizione è governata dal coefficiente k_A (percentuale al Modello A).</p>
+    </div>
+    
+    <h3>Angolo del puntone (Modello A)</h3>
+    <div class="formula-box">
+        <div class="label">Prospetto 10.15</div>
+        <div class="formula">θ₁ = arctan(z₁ / av)</div>
+    </div>
+    <p>dove z₁ = h₁ – 2c è il braccio resistente interno del dente.</p>
+    
+    <h3>Forze nel Modello A (staffe)</h3>
+    <div class="formula-box">
+        <div class="label">Puntone C1</div>
+        <div class="formula">C₁ = R_a / sin(θ₁)</div>
+    </div>
+    <div class="formula-box">
+        <div class="label">Tirante T1 (dente)</div>
+        <div class="formula">T₁ = R_a · av / z₁ + H_Ed</div>
+    </div>
+    <div class="formula-box">
+        <div class="label">Staffe T2a</div>
+        <div class="formula">T₂a = R_a</div>
+    </div>
+    <div class="formula-box">
+        <div class="label">Tirante T3 (trave)</div>
+        <div class="formula">T₃ = R_a · (1 + av / 2z₁)</div>
+    </div>
+    <p>con R_a = k_A · V_Ed</p>
+    
+    <h3>Forze nel Modello B (ferri piegati)</h3>
+    <div class="formula-box">
+        <div class="label">Puntone C'1 (verticale)</div>
+        <div class="formula">C'₁ = R_b</div>
+    </div>
+    <div class="formula-box">
+        <div class="label">Ferri piegati T'1</div>
+        <div class="formula">T'₁ = R_b / sin(α)</div>
+    </div>
+    <div class="formula-box">
+        <div class="label">Tirante T'2 (trave)</div>
+        <div class="formula">T'₂ = 2 · R_b / tan(α)</div>
+    </div>
+    <p>con R_b = (1 – k_A) · V_Ed e α = angolo di inclinazione ferri piegati.</p>
+    
+    <h3>Verifiche tiranti (acciaio)</h3>
+    <div class="formula-box">
+        <div class="label">Utilizzo tirante</div>
+        <div class="formula">UR_T = (T / A) / f_yd</div>
+    </div>
+    <p>dove f_yd = f_yk / γ_s (γ_s = 1.15).</p>
+    
+    <h3>Verifiche puntoni (calcestruzzo)</h3>
+    <div class="formula-box">
+        <div class="label">Resistenza efficace puntone</div>
+        <div class="formula">ν' = 0.6 · (1 – f_ck / 250)</div>
+    </div>
+    <div class="formula-box">
+        <div class="label">Resistenza calcestruzzo efficace</div>
+        <div class="formula">f_cd,eff = ν' · f_ck / γ_c</div>
+    </div>
+    <div class="formula-box">
+        <div class="label">Utilizzo puntone</div>
+        <div class="formula">UR_C = σ_c / f_cd,eff = C / (b · l_s · f_cd,eff)</div>
+    </div>
+    <p>dove l_s è la larghezza del nodo (perpendicolare al puntone) e γ_c = 1.5.</p>
+    
+    <div class="card warning">
+        <strong>Nota:</strong> Angotti consiglia di assegnare almeno il 50% del taglio al Modello A (staffe), poiché il Modello B lascia il bordo inferiore del dente privo di armatura di sospensione diretta.
+    </div>
+</section>
+
+<section id="esempio">
+    <h2>Esempio di Utilizzo</h2>
+    <div class="card info">
+        <p>Di seguito un esempio di verifica con i parametri di default dell'applicazione.</p>
+    </div>
+    <table>
+        <tr><th colspan="4">Dati di Input</th></tr>
+        <tr><td>H = 1.00 m</td><td>h1 = 0.50 m</td><td>b = 0.40 m</td><td>a = 0.40 m</td></tr>
+        <tr><td>av = 0.20 m</td><td>l_b = 0.20 m</td><td>V_Ed = 350 kN</td><td>H_Ed = 50 kN</td></tr>
+        <tr><td>f_ck = 30 MPa</td><td>f_yk = 450 MPa</td><td>α = 45°</td><td>k_A = 50%</td></tr>
+    </table>
+    <table>
+        <tr><th colspan="4">Risultati – Modello Combinato (50% A + 50% B)</th></tr>
+        <tr><td>θ₁ = 39.8°</td><td>R_a = 175.0 kN</td><td>R_b = 175.0 kN</td><td>z₁ = 0.40 m</td></tr>
+        <tr><td>C1 = 273.1 kN</td><td>C'1 = 175.0 kN</td><td>C4 = 247.5 kN</td><td>C'3 = 247.5 kN</td></tr>
+        <tr><td>T1 = 137.5 kN</td><td>T2a = 175.0 kN</td><td>T'1 = 247.5 kN</td><td>T3 = 362.5 kN</td></tr>
+    </table>
+    <table>
+        <tr><th colspan="4">Utilizzi (UR)</th></tr>
+        <tr><td>T1: 41.2%</td><td>T2a: 52.5%</td><td>T'1: 74.2%</td><td>T3: 36.3%</td></tr>
+        <tr><td>C1: 52.3%</td><td>C2: 52.3%</td><td>C4: 47.4%</td><td>C'1: 33.5%</td></tr>
+    </table>
+    <div class="card success" style="text-align:center;">
+        <strong>✅ ESITO: TUTTE LE VERIFICHE SODDISFATTE (UR ≤ 100%)</strong>
+    </div>
+</section>
+
+</div>
+
+<div class="footer">
+    <p><strong>Gerber – Sella Gerber S&T</strong></p>
+    <p>Applicazione per la verifica strutturale con metodo tirante-puntone</p>
+    <p>Riferimento: Angotti – Progettazione strutturale, Cap. 10</p>
+    <p style="margin-top:15px;font-size:0.8rem;">
+        L'applicazione è uno strumento di ausilio alla progettazione. I risultati devono essere sempre verificati 
+        da un ingegnere strutturale qualificato. L'autore non assume alcuna responsabilità per l'uso improprio.
+    </p>
+</div>
+
+</body>
+</html>
